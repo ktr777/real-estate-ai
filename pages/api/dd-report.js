@@ -1,18 +1,13 @@
 export const config = { runtime: "edge" };
 
-import Anthropic from "@anthropic-ai/sdk";
-
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-export default async function handler(req, res) {
+export default async function handler(req) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
   }
 
-  const { params, results } = req.body;
+  const { params, results } = await req.json();
 
-  const prompt = `
-あなたは不動産投資の専門アナリストです。以下の物件情報と収益シミュレーション結果をもとに、投資DDレポートを作成してください。
+  const prompt = `あなたは不動産投資の専門アナリストです。以下の物件情報と収益シミュレーション結果をもとに、投資DDレポートを作成してください。
 
 ## 物件情報
 - 物件価格: ${(params.price / 100000000).toFixed(2)}億円
@@ -24,72 +19,76 @@ export default async function handler(req, res) {
 - 用途: ${params.usage || "レジデンシャル"}
 
 ## 収益シミュレーション結果
-- 満室想定賃料: ${(results.grossRent / 10000).toFixed(0)}万円/年
-- 実効賃料: ${(results.effectiveRent / 10000).toFixed(0)}万円/年
 - NOI: ${(results.noi / 10000).toFixed(0)}万円/年
-- 表面利回り（グロス）: ${(results.grossRent / params.price * 100).toFixed(2)}%
-- 還元利回り（Cap Rate）: ${(results.capRate * 100).toFixed(2)}%
+- Cap Rate: ${(results.capRate * 100).toFixed(2)}%
 - IRR: ${(results.irr * 100).toFixed(2)}%
 - DSCR: ${results.dscr.toFixed(2)}倍
 - Equity Multiple: ${results.equityMultiple.toFixed(2)}倍
 - LTV: ${(params.ltv * 100).toFixed(0)}%
-- 借入金利: ${(params.interestRate * 100).toFixed(2)}%
 - 保有期間: ${params.holdYears}年
-- 出口Cap率想定: ${(params.exitCapRate * 100).toFixed(2)}%
-- 想定売却価格: ${(results.exitPrice / 100000000).toFixed(2)}億円
 
-以下の構成でレポートを作成してください。日本語でプロフェッショナルなトーンで記述してください。
-
-# 投資DDレポート
+# 投資DDレポートを以下の構成で作成してください。
 
 ## 1. エグゼクティブサマリー
-（3〜5文で投資判断の要点をまとめる）
-
 ## 2. 収益性分析
 ### 2-1. 利回り評価
 ### 2-2. キャッシュフロー評価
 ### 2-3. IRR・エクイティマルチプル評価
-
 ## 3. リスク分析
 ### 3-1. 空室リスク
 ### 3-2. 金利上昇リスク
-### 3-3. 出口リスク（流動性・価格変動）
-### 3-4. 物件固有リスク（築年数・修繕リスク）
+### 3-3. 出口リスク
+## 4. 投資判断
+## 5. 改善提案・条件交渉ポイント`;
 
-## 4. 市場環境
-（エリア・用途別の市場環境について一般的な観点から言及）
-
-## 5. 投資判断
-（総合評価：推奨 / 要条件確認 / 非推奨 のいずれかを明記し、理由を述べる）
-
-## 6. 改善提案・条件交渉ポイント
-（価格・条件面で改善余地があれば具体的に提案）
-`;
-
-  try {
-    // ストリーミングレスポンス
-    res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.setHeader("Transfer-Encoding", "chunked");
-    res.setHeader("Cache-Control", "no-cache");
-
-    const stream = client.messages.stream({
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": process.env.ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+      "anthropic-beta": "messages-2023-12-15",
+    },
+    body: JSON.stringify({
       model: "claude-sonnet-4-6",
       max_tokens: 2000,
+      stream: true,
       messages: [{ role: "user", content: prompt }],
-    });
+    }),
+  });
 
-    for await (const chunk of stream) {
-      if (
-        chunk.type === "content_block_delta" &&
-        chunk.delta.type === "text_delta"
-      ) {
-        res.write(chunk.delta.text);
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const reader = response.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const text = decoder.decode(value);
+        const lines = text.split("\n");
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const data = line.slice(6);
+            if (data === "[DONE]") continue;
+            try {
+              const json = JSON.parse(data);
+              if (json.type === "content_block_delta" && json.delta?.text) {
+                controller.enqueue(encoder.encode(json.delta.text));
+              }
+            } catch {}
+          }
+        }
       }
-    }
+      controller.close();
+    },
+  });
 
-    res.end();
-  } catch (error) {
-    console.error("Claude API error:", error);
-    res.status(500).json({ error: "APIエラーが発生しました: " + error.message });
-  }
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-cache",
+    },
+  });
 }
