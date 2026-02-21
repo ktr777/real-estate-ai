@@ -25,7 +25,7 @@ LTV: ${(params.ltv * 100).toFixed(0)}%
 ## 4. 投資判断
 ## 5. 改善提案`;
 
-  const anthropicRes = await fetch("https://api.notion.com/v1/messages".replace("notion.com", "anthropic.com"), {
+  const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
