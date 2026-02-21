@@ -1,27 +1,19 @@
-import Anthropic from "@anthropic-ai/sdk";
+export const config = { runtime: "edge" };
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-export const config = {
-  api: { responseLimit: false },
-};
-
-export default async function handler(req, res) {
+export default async function handler(req) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return new Response("Method not allowed", { status: 405 });
   }
 
-  const { params, results } = req.body;
+  const { params, results } = await req.json();
 
   const prompt = `あなたは不動産投資の専門アナリストです。以下の物件情報と収益シミュレーション結果をもとに、投資DDレポートを作成してください。
 
 ## 物件情報
 - 物件価格: ${(params.price / 100000000).toFixed(2)}億円
 - 専有面積: ${params.area}㎡
-- 賃料単価: ${params.rentPerSqm.toLocaleString()}円/㎡/月
 - エリア: ${params.area_name || "未指定"}
 - 築年数: ${params.buildingAge || "未指定"}年
-- 構造: ${params.structure || "未指定"}
 - 用途: ${params.usage || "レジデンシャル"}
 
 ## 収益シミュレーション結果
@@ -49,24 +41,50 @@ export default async function handler(req, res) {
 ## 4. 投資判断
 ## 5. 改善提案・条件交渉ポイント`;
 
-  res.setHeader("Content-Type", "text/plain; charset=utf-8");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("X-Accel-Buffering", "no");
-
-  try {
-    const stream = client.messages.stream({
+  const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": process.env.ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
       model: "claude-sonnet-4-6",
       max_tokens: 2000,
+      stream: true,
       messages: [{ role: "user", content: prompt }],
-    });
+    }),
+  });
 
-    for await (const chunk of stream) {
-      if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
-        res.write(chunk.delta.text);
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const reader = anthropicRes.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) { controller.close(); break; }
+        const lines = decoder.decode(value).split("\n");
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const data = line.slice(6).trim();
+          if (data === "[DONE]" || !data) continue;
+          try {
+            const json = JSON.parse(data);
+            if (json.type === "content_block_delta" && json.delta?.type === "text_delta") {
+              controller.enqueue(encoder.encode(json.delta.text));
+            }
+          } catch {}
+        }
       }
     }
-    res.end();
-  } catch (error) {
-    res.status(500).end("APIエラー: " + error.message);
-  }
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-cache",
+    },
+  });
 }
