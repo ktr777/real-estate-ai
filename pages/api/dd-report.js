@@ -1,11 +1,17 @@
-export const config = { runtime: "edge" };
+import Anthropic from "@anthropic-ai/sdk";
 
-export default async function handler(req) {
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+export const config = {
+  api: { responseLimit: false },
+};
+
+export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { params, results } = await req.json();
+  const { params, results } = req.body;
 
   const prompt = `あなたは不動産投資の専門アナリストです。以下の物件情報と収益シミュレーション結果をもとに、投資DDレポートを作成してください。
 
@@ -27,7 +33,9 @@ export default async function handler(req) {
 - LTV: ${(params.ltv * 100).toFixed(0)}%
 - 保有期間: ${params.holdYears}年
 
-# 投資DDレポートを以下の構成で作成してください。
+以下の構成でレポートを作成してください。
+
+# 投資DDレポート
 
 ## 1. エグゼクティブサマリー
 ## 2. 収益性分析
@@ -41,54 +49,24 @@ export default async function handler(req) {
 ## 4. 投資判断
 ## 5. 改善提案・条件交渉ポイント`;
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": process.env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-      "anthropic-beta": "messages-2023-12-15",
-    },
-    body: JSON.stringify({
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("X-Accel-Buffering", "no");
+
+  try {
+    const stream = client.messages.stream({
       model: "claude-sonnet-4-6",
       max_tokens: 2000,
-      stream: true,
       messages: [{ role: "user", content: prompt }],
-    }),
-  });
+    });
 
-  const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
-
-  const stream = new ReadableStream({
-    async start(controller) {
-      const reader = response.body.getReader();
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const text = decoder.decode(value);
-        const lines = text.split("\n");
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const data = line.slice(6);
-            if (data === "[DONE]") continue;
-            try {
-              const json = JSON.parse(data);
-              if (json.type === "content_block_delta" && json.delta?.text) {
-                controller.enqueue(encoder.encode(json.delta.text));
-              }
-            } catch {}
-          }
-        }
+    for await (const chunk of stream) {
+      if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
+        res.write(chunk.delta.text);
       }
-      controller.close();
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-cache",
-    },
-  });
+    }
+    res.end();
+  } catch (error) {
+    res.status(500).end("APIエラー: " + error.message);
+  }
 }
