@@ -85,10 +85,10 @@ export default function PDFExport({ params, results }) {
           <div style={{ fontSize: 11, letterSpacing: "0.2em", color: "#3b82f6", marginBottom: 6 }}>
             REAL ESTATE INVESTMENT AI — REPORT
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 6px", color: "#fff" }}>
+          <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 6px", color: "#1a2540" }}>
             投資収益シミュレーション レポート
           </h1>
-          <div style={{ fontSize: 12, color: "#94a3b8" }}>
+          <div style={{ fontSize: 12, color: "#475569" }}>
             作成日：{today}　／　
             {params.area_name && `エリア：${params.area_name}　／　`}
             {params.usage && `用途：${params.usage}`}
@@ -112,7 +112,7 @@ export default function PDFExport({ params, results }) {
             }}>
               <div style={{ fontSize: 9, letterSpacing: "0.15em", color: "#475569", marginBottom: 4 }}>{label}</div>
               <div style={{ fontSize: 18, fontFamily: "monospace", fontWeight: 700, color: accent ? "#60a5fa" : "#e2e8f0" }}>{value}</div>
-              <div style={{ fontSize: 9, color: "#334155", marginTop: 2 }}>{sub}</div>
+              <div style={{ fontSize: 9, color: "#1a2540", marginTop: 2 }}>{sub}</div>
             </div>
           ))}
         </div>
@@ -120,11 +120,11 @@ export default function PDFExport({ params, results }) {
         {/* 2カラム */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
           {/* NOI内訳 */}
-          <div style={{ background: "#f8fafc", border: "1px solid #1e293b", borderRadius: 8, padding: 16 }}>
+          <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: 16 }}>
             <div style={{ fontSize: 10, letterSpacing: "0.15em", color: "#475569", marginBottom: 12 }}>NOI 内訳</div>
             {[
               { label: "満室想定賃料",      value: r.grossRent,     color: "#3b82f6" },
-              { label: "有効賃料（空室後）", value: r.effectiveRent, color: "#60a5fa" },
+              { label: "有効賃料（空室後）", value: r.effectiveRent, color: "#2563eb" },
               { label: "管理費（△）",      value: -r.managementFee, color: "#f87171" },
               { label: "修繕積立（△）",    value: -r.repairReserve, color: "#f87171" },
               { label: "固定資産税（△）",  value: -r.propertyTax,   color: "#f87171" },
@@ -132,8 +132,8 @@ export default function PDFExport({ params, results }) {
               { label: "元利返済（△）",    value: -r.annualDebt,    color: "#f87171" },
               { label: "FCF",              value: r.fcf,             color: r.fcf >= 0 ? "#10b981" : "#ef4444", bold: true },
             ].map(({ label, value, color, bold }) => (
-              <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #0a1f3d" }}>
-                <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: bold ? 600 : 400 }}>{label}</span>
+              <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #e2e8f0" }}>
+                <span style={{ fontSize: 11, color: "#475569", fontWeight: bold ? 600 : 400 }}>{label}</span>
                 <span style={{ fontSize: 12, fontFamily: "monospace", color, fontWeight: bold ? 700 : 400 }}>
                   {value >= 0 ? "" : "▲ "}{fmtM(Math.abs(value))}
                 </span>
@@ -142,7 +142,7 @@ export default function PDFExport({ params, results }) {
           </div>
 
           {/* 資金計画 */}
-          <div style={{ background: "#f8fafc", border: "1px solid #1e293b", borderRadius: 8, padding: 16 }}>
+          <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: 16 }}>
             <div style={{ fontSize: 10, letterSpacing: "0.15em", color: "#475569", marginBottom: 12 }}>資金計画</div>
             {[
               { label: "物件価格",     value: fmtM(params.price) },
@@ -154,8 +154,8 @@ export default function PDFExport({ params, results }) {
               { label: "想定売却価格", value: fmtM(r.exitPrice) },
               { label: "売却手取り",   value: fmtM(r.exitProceeds) },
             ].map(({ label, value, bold }) => (
-              <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #0a1f3d" }}>
-                <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: bold ? 600 : 400 }}>{label}</span>
+              <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #e2e8f0" }}>
+                <span style={{ fontSize: 11, color: "#475569", fontWeight: bold ? 600 : 400 }}>{label}</span>
                 <span style={{ fontSize: 12, fontFamily: "monospace", color: "#1a2540", fontWeight: bold ? 700 : 400 }}>{value}</span>
               </div>
             ))}
@@ -163,13 +163,13 @@ export default function PDFExport({ params, results }) {
         </div>
 
         {/* 年次CF表 */}
-        <div style={{ background: "#f8fafc", border: "1px solid #1e293b", borderRadius: 8, padding: 16, marginBottom: 24 }}>
+        <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: 16, marginBottom: 24 }}>
           <div style={{ fontSize: 10, letterSpacing: "0.15em", color: "#475569", marginBottom: 12 }}>年次キャッシュフロー</div>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
             <thead>
               <tr>
                 {["年次", "NOI", "元利返済", "FCF", "残債"].map((h) => (
-                  <th key={h} style={{ padding: "6px 8px", textAlign: "right", color: "#94a3b8", borderBottom: "1px solid #1e293b", fontWeight: 500, whiteSpace: "nowrap" }}>{h}</th>
+                  <th key={h} style={{ padding: "6px 8px", textAlign: "right", color: "#475569", borderBottom: "1px solid #e2e8f0", fontWeight: 500, whiteSpace: "nowrap" }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -177,7 +177,7 @@ export default function PDFExport({ params, results }) {
               {r.yearlyData.slice(0, 10).map((row) => (
                 <tr key={row.year}>
                   {[row.year, fmtM(row.NOI), fmtM(row.元利返済), fmtM(row.FCF), fmtM(row.残債)].map((v, i) => (
-                    <td key={i} style={{ padding: "6px 8px", textAlign: "right", fontFamily: "monospace", color: i === 3 ? (row.FCF >= 0 ? "#10b981" : "#ef4444") : "#94a3b8", borderBottom: "1px solid #0a1f3d" }}>{v}</td>
+                    <td key={i} style={{ padding: "6px 8px", textAlign: "right", fontFamily: "monospace", color: i === 3 ? (row.FCF >= 0 ? "#10b981" : "#ef4444") : "#94a3b8", borderBottom: "1px solid #e2e8f0" }}>{v}</td>
                   ))}
                 </tr>
               ))}
@@ -186,7 +186,7 @@ export default function PDFExport({ params, results }) {
         </div>
 
         {/* フッター */}
-        <div style={{ borderTop: "1px solid #1e293b", paddingTop: 12, fontSize: 10, color: "#334155", textAlign: "center" }}>
+        <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: 12, fontSize: 10, color: "#1a2540", textAlign: "center" }}>
           本レポートはAIによる自動生成です。投資判断は必ず専門家にご相談ください。　／　Generated by Investment AI
         </div>
       </div>
