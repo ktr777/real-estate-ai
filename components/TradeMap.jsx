@@ -35,7 +35,18 @@ export default function TradeMap({ trades, areaName }) {
   }, []);
 
   useEffect(() => {
-    if (!mapInstanceRef.current || trades.length === 0) return;
+    if (trades.length === 0) return;
+    // mapが初期化されるまで待つ
+    const wait = setInterval(() => {
+      if (!mapInstanceRef.current) return;
+      clearInterval(wait);
+      runGeocode();
+    }, 200);
+    return () => clearInterval(wait);
+  }, [trades]);
+
+  const runGeocode = async () => {
+    if (!mapInstanceRef.current) return;
 
     const map = mapInstanceRef.current;
 
@@ -107,7 +118,7 @@ export default function TradeMap({ trades, areaName }) {
         if (firstCoords) map.setView([firstCoords.lat, firstCoords.lon], 14);
       }
     });
-  }, [trades]);
+  };
 
   return (
     <div style={{ position: "relative" }}>
