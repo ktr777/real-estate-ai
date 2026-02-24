@@ -169,7 +169,7 @@ export default function TradeHistory({ params }) {
             </div>
           </div>
           <div style={{ marginBottom: 16 }}>
-            <TradeMap trades={filtered.slice(0, 200)} />
+            <TradeMap trades={filtered.slice(0, 200)} areaName={params.area_name} />
           </div>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
