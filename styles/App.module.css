@@ -463,3 +463,70 @@
   z-index: 100;
   pointer-events: none;
 }
+
+/* ComparePanel */
+.propertyCard {
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 16px;
+  flex: 1;
+  min-width: 280px;
+}
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.colorDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.propertyName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a2540;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+.removeBtn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 16px;
+}
+.textRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.sliders { display: flex; flex-direction: column; gap: 6px; }
+.miniKpi {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+.miniKpiItem { text-align: center; }
+.miniKpiLabel { font-size: 9px; color: #94a3b8; margin-bottom: 2px; }
+.miniKpiValue { font-size: 13px; font-weight: 700; }
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
