@@ -3,12 +3,23 @@ import { getPrefectureCode, getCityCode } from "../lib/prefectures";
 
 const fmtMan = (v) => v ? `¥${Math.round(v / 10000).toLocaleString()}万` : "-";
 
+const YEARS = ["2024", "2023", "2022", "2021", "2020"];
+const TYPES = [
+  { value: "all", label: "すべて" },
+  { value: "中古マンション等", label: "中古マンション" },
+  { value: "宅地(土地と建物)", label: "宅地(土地と建物)" },
+  { value: "土地", label: "土地" },
+];
+
 export default function TradeHistory({ params }) {
-  const [trades, setTrades]   = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState("");
-  const [searched, setSearched] = useState(false);
-  const [page, setPage] = useState(1);
+  const [trades, setTrades]       = useState([]);
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState("");
+  const [searched, setSearched]   = useState(false);
+  const [page, setPage]           = useState(1);
+  const [filterType, setFilterType] = useState("all");
+  const [sortOrder, setSortOrder]   = useState("none");
+  const [selectedYear, setSelectedYear] = useState("2024");
   const PAGE_SIZE = 50;
 
   const search = async () => {
@@ -18,24 +29,20 @@ export default function TradeHistory({ params }) {
       setError("エリア名に都道府県名または市区町村名を含めてください（例：福岡市中央区、東京都渋谷区）");
       return;
     }
-
     setLoading(true);
     setError("");
     setTrades([]);
-
+    setPage(1);
     try {
       const res = await fetch("/api/trade-history", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ area: areaCode, city: cityCode, year: "2024" }),
+        body: JSON.stringify({ area: areaCode, city: cityCode, year: selectedYear }),
       });
       const data = await res.json();
-      const items = (data.data || [])
-        .filter(d => d.Type === "中古マンション等" || d.Type === "宅地(土地と建物)")
-        ;
-      console.log("total from API:", data.data?.length, "filtered:", items.length);
+      const items = data.data || [];
+      console.log("total from API:", items.length);
       setTrades(items);
-      setPage(1);
       setSearched(true);
     } catch (e) {
       setError("データの取得に失敗しました: " + e.message);
@@ -44,14 +51,26 @@ export default function TradeHistory({ params }) {
     }
   };
 
+  // フィルタ・ソート
+  let filtered = [...trades];
+  if (filterType !== "all") filtered = filtered.filter(t => t.Type === filterType);
+  if (sortOrder === "asc") filtered.sort((a, b) => (a.TradePrice/a.Area||0) - (b.TradePrice/b.Area||0));
+  if (sortOrder === "desc") filtered.sort((a, b) => (b.TradePrice/b.Area||0) - (a.TradePrice/a.Area||0));
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paged = filtered.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
+
+  const selectStyle = {
+    padding: "6px 10px", borderRadius: 6, border: "1px solid #cbd5e1",
+    fontSize: 12, color: "#1a2540", background: "#fff", cursor: "pointer",
+  };
+
   return (
     <div style={{ padding: 24 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+      {/* ヘッダー */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div>
           <div style={{ fontSize: 18, fontWeight: 700, color: "#1a2540" }}>周辺取引事例</div>
-          <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>
-            国土交通省 不動産情報ライブラリ（2024年）
-          </div>
+          <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>国土交通省 不動産情報ライブラリ</div>
         </div>
         <button
           onClick={search}
@@ -59,16 +78,40 @@ export default function TradeHistory({ params }) {
           style={{
             padding: "10px 24px",
             background: loading ? "#cbd5e1" : "linear-gradient(135deg, #2563eb, #7c3aed)",
-            color: "#fff",
-            border: "none",
-            borderRadius: 8,
-            fontSize: 13,
-            fontWeight: 600,
-            cursor: loading ? "not-allowed" : "pointer",
+            color: "#fff", border: "none", borderRadius: 8,
+            fontSize: 13, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer",
           }}
         >
           {loading ? "取得中..." : "取引事例を取得"}
         </button>
+      </div>
+
+      {/* 検索条件 */}
+      <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 12, color: "#475569" }}>取得年：</span>
+          <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={selectStyle}>
+            {YEARS.map(y => <option key={y} value={y}>{y}年</option>)}
+          </select>
+        </div>
+        {searched && (
+          <>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 12, color: "#475569" }}>種類：</span>
+              <select value={filterType} onChange={e => { setFilterType(e.target.value); setPage(1); }} style={selectStyle}>
+                {TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+              </select>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 12, color: "#475569" }}>坪単価：</span>
+              <select value={sortOrder} onChange={e => { setSortOrder(e.target.value); setPage(1); }} style={selectStyle}>
+                <option value="none">ソートなし</option>
+                <option value="desc">高い順</option>
+                <option value="asc">低い順</option>
+              </select>
+            </div>
+          </>
+        )}
       </div>
 
       {error && (
@@ -86,18 +129,20 @@ export default function TradeHistory({ params }) {
         </div>
       )}
 
-      {trades.length > 0 && (
+      {filtered.length > 0 && (
         <>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <div style={{ fontSize: 12, color: "#64748b" }}>{trades.length}件の取引事例（{(page-1)*PAGE_SIZE+1}〜{Math.min(page*PAGE_SIZE, trades.length)}件を表示）</div>
+            <div style={{ fontSize: 12, color: "#64748b" }}>
+              {filtered.length}件（{(page-1)*PAGE_SIZE+1}〜{Math.min(page*PAGE_SIZE, filtered.length)}件を表示）
+            </div>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1}
                 style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid #cbd5e1", background: page===1?"#f1f5f9":"#fff", cursor: page===1?"not-allowed":"pointer", fontSize: 12 }}>
                 ← 前へ
               </button>
-              <span style={{ fontSize: 12, color: "#475569" }}>{page} / {Math.ceil(trades.length/PAGE_SIZE)}</span>
-              <button onClick={() => setPage(p => Math.min(Math.ceil(trades.length/PAGE_SIZE), p+1))} disabled={page===Math.ceil(trades.length/PAGE_SIZE)}
-                style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid #cbd5e1", background: page===Math.ceil(trades.length/PAGE_SIZE)?"#f1f5f9":"#fff", cursor: page===Math.ceil(trades.length/PAGE_SIZE)?"not-allowed":"pointer", fontSize: 12 }}>
+              <span style={{ fontSize: 12, color: "#475569" }}>{page} / {totalPages}</span>
+              <button onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page===totalPages}
+                style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid #cbd5e1", background: page===totalPages?"#f1f5f9":"#fff", cursor: page===totalPages?"not-allowed":"pointer", fontSize: 12 }}>
                 次へ →
               </button>
             </div>
@@ -112,7 +157,7 @@ export default function TradeHistory({ params }) {
                 </tr>
               </thead>
               <tbody>
-                {trades.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE).map((t, i) => {
+                {paged.map((t, i) => {
                   const tsubo = t.Area && t.TradePrice ? Math.round(t.TradePrice / (t.Area * 0.3025) / 10000) : null;
                   return (
                     <tr key={i} style={{ borderBottom: "1px solid #e2e8f0", background: i % 2 === 0 ? "#fff" : "#f8fafc" }}>
@@ -133,9 +178,9 @@ export default function TradeHistory({ params }) {
         </>
       )}
 
-      {searched && trades.length === 0 && !loading && (
+      {searched && filtered.length === 0 && !loading && (
         <div style={{ textAlign: "center", padding: 40, color: "#94a3b8" }}>
-          取引事例が見つかりませんでした
+          条件に合う取引事例が見つかりませんでした
         </div>
       )}
     </div>
