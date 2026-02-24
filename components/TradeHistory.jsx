@@ -30,7 +30,8 @@ export default function TradeHistory({ params }) {
       const data = await res.json();
       const items = (data.data || [])
         .filter(d => d.Type === "中古マンション等" || d.Type === "宅地(土地と建物)")
-        .slice(0, 50);
+        .slice(0, 200);
+      console.log("total from API:", data.data?.length, "filtered:", items.length);
       setTrades(items);
       setSearched(true);
     } catch (e) {
