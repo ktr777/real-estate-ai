@@ -8,6 +8,8 @@ export default function TradeHistory({ params }) {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
   const [searched, setSearched] = useState(false);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 20;
 
   const search = async () => {
     const cityCode = getCityCode(params.area_name || "");
@@ -30,9 +32,10 @@ export default function TradeHistory({ params }) {
       const data = await res.json();
       const items = (data.data || [])
         .filter(d => d.Type === "中古マンション等" || d.Type === "宅地(土地と建物)")
-        .slice(0, 200);
+        ;
       console.log("total from API:", data.data?.length, "filtered:", items.length);
       setTrades(items);
+      setPage(1);
       setSearched(true);
     } catch (e) {
       setError("データの取得に失敗しました: " + e.message);
@@ -85,7 +88,20 @@ export default function TradeHistory({ params }) {
 
       {trades.length > 0 && (
         <>
-          <div style={{ fontSize: 12, color: "#64748b", marginBottom: 12 }}>{trades.length}件の取引事例が見つかりました</div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <div style={{ fontSize: 12, color: "#64748b" }}>{trades.length}件の取引事例（{(page-1)*PAGE_SIZE+1}〜{Math.min(page*PAGE_SIZE, trades.length)}件を表示）</div>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1}
+                style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid #cbd5e1", background: page===1?"#f1f5f9":"#fff", cursor: page===1?"not-allowed":"pointer", fontSize: 12 }}>
+                ← 前へ
+              </button>
+              <span style={{ fontSize: 12, color: "#475569" }}>{page} / {Math.ceil(trades.length/PAGE_SIZE)}</span>
+              <button onClick={() => setPage(p => Math.min(Math.ceil(trades.length/PAGE_SIZE), p+1))} disabled={page===Math.ceil(trades.length/PAGE_SIZE)}
+                style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid #cbd5e1", background: page===Math.ceil(trades.length/PAGE_SIZE)?"#f1f5f9":"#fff", cursor: page===Math.ceil(trades.length/PAGE_SIZE)?"not-allowed":"pointer", fontSize: 12 }}>
+                次へ →
+              </button>
+            </div>
+          </div>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
               <thead>
@@ -96,7 +112,7 @@ export default function TradeHistory({ params }) {
                 </tr>
               </thead>
               <tbody>
-                {trades.map((t, i) => {
+                {trades.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE).map((t, i) => {
                   const tsubo = t.Area && t.TradePrice ? Math.round(t.TradePrice / (t.Area * 0.3025) / 10000) : null;
                   return (
                     <tr key={i} style={{ borderBottom: "1px solid #e2e8f0", background: i % 2 === 0 ? "#fff" : "#f8fafc" }}>
