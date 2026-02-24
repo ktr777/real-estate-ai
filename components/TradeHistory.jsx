@@ -55,6 +55,8 @@ export default function TradeHistory({ params }) {
   let filtered = [...trades];
   if (filterType !== "all") filtered = filtered.filter(t => t.Type === filterType);
   if (sortOrder === "asc") filtered.sort((a, b) => (a.TradePrice/a.Area||0) - (b.TradePrice/b.Area||0));
+  if (sortOrder === "district_asc") filtered.sort((a, b) => (a.DistrictName||'').localeCompare(b.DistrictName||'', 'ja'));
+  if (sortOrder === "district_desc") filtered.sort((a, b) => (b.DistrictName||'').localeCompare(a.DistrictName||'', 'ja'));
   if (sortOrder === "desc") filtered.sort((a, b) => (b.TradePrice/b.Area||0) - (a.TradePrice/a.Area||0));
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paged = filtered.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
@@ -108,6 +110,8 @@ export default function TradeHistory({ params }) {
                 <option value="none">ソートなし</option>
                 <option value="desc">高い順</option>
                 <option value="asc">低い順</option>
+                <option value="district_asc">地区名（昇順）</option>
+                <option value="district_desc">地区名（降順）</option>
               </select>
             </div>
           </>
