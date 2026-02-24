@@ -206,8 +206,15 @@ export default function Home() {
                 </div>
               )}
 
+              {/* 周辺取引事例 */}
+              {tab === "周辺取引事例" && (
+                <div className={styles.card}>
+                  <TradeHistory params={params} />
+                </div>
+              )}
+
               {/* DDレポート */}
-              {tab === "周辺取引事例", "DDレポート" && (
+              {tab === "DDレポート" && (
                 <div className={styles.card}>
                   <DDReport params={params} results={r} onReportGenerated={setDdReport} />
                 </div>
