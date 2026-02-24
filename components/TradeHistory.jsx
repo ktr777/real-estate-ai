@@ -18,7 +18,8 @@ export default function TradeHistory({ params }) {
   const [searched, setSearched]   = useState(false);
   const [page, setPage]           = useState(1);
   const [filterType, setFilterType] = useState("all");
-  const [sortOrder, setSortOrder]   = useState("none");
+  const [sortTsubo, setSortTsubo]   = useState("none");
+  const [sortDistrict, setSortDistrict] = useState("none");
   const [selectedYear, setSelectedYear] = useState("2024");
   const PAGE_SIZE = 50;
 
@@ -106,12 +107,18 @@ export default function TradeHistory({ params }) {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ fontSize: 12, color: "#475569" }}>坪単価：</span>
-              <select value={sortOrder} onChange={e => { setSortOrder(e.target.value); setPage(1); }} style={selectStyle}>
+              <select value={sortTsubo} onChange={e => { setSortTsubo(e.target.value); setPage(1); }} style={selectStyle}>
                 <option value="none">ソートなし</option>
                 <option value="desc">高い順</option>
                 <option value="asc">低い順</option>
-                <option value="district_asc">地区名（昇順）</option>
-                <option value="district_desc">地区名（降順）</option>
+              </select>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 12, color: "#475569" }}>地区名：</span>
+              <select value={sortDistrict} onChange={e => { setSortDistrict(e.target.value); setPage(1); }} style={selectStyle}>
+                <option value="none">ソートなし</option>
+                <option value="asc">昇順</option>
+                <option value="desc">降順</option>
               </select>
             </div>
           </>
