@@ -33,8 +33,8 @@ export default function DDReport({ params, results, onReportGenerated }) {
       });
 
       if (!res.ok) {
-        const e = await res.json();
-        throw new Error(e.error || "APIエラー");
+        const e = await res.text();
+        throw new Error(e || "APIエラー");
       }
 
       const reader = res.body.getReader();
