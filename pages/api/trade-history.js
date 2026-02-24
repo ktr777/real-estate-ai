@@ -9,8 +9,7 @@ export default async function handler(req) {
 
   const params = new URLSearchParams({
     year: year || "2024",
-    area: area,
-    ...(city ? { city } : {}),
+    ...(city ? { city } : { area }),
     priceClassification: "01",
   });
 

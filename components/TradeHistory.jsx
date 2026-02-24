@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getPrefectureCode } from "../lib/prefectures";
+import { getPrefectureCode, getCityCode } from "../lib/prefectures";
 
 const fmtMan = (v) => v ? `¥${Math.round(v / 10000).toLocaleString()}万` : "-";
 
@@ -10,9 +10,10 @@ export default function TradeHistory({ params }) {
   const [searched, setSearched] = useState(false);
 
   const search = async () => {
+    const cityCode = getCityCode(params.area_name || "");
     const areaCode = getPrefectureCode(params.area_name || "");
-    if (!areaCode) {
-      setError("エリア名に都道府県名を含めてください（例：福岡市中央区、東京都渋谷区）");
+    if (!areaCode && !cityCode) {
+      setError("エリア名に都道府県名または市区町村名を含めてください（例：福岡市中央区、東京都渋谷区）");
       return;
     }
 
@@ -24,7 +25,7 @@ export default function TradeHistory({ params }) {
       const res = await fetch("/api/trade-history", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ area: areaCode, year: "2024" }),
+        body: JSON.stringify({ area: areaCode, city: cityCode, year: "2024" }),
       });
       const data = await res.json();
       const items = (data.data || [])
