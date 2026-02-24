@@ -4,6 +4,7 @@ import InputPanel    from "../components/InputPanel";
 import KPICards      from "../components/KPICards";
 import DDReport      from "../components/DDReport";
 import PDFExport     from "../components/PDFExport";
+import TradeHistory from "../components/TradeHistory";
 import NotionExport  from "../components/NotionExport";
 import ComparePanel  from "../components/ComparePanel";
 import { CashflowChart, CumulativeFCFChart, SensitivityChart, LoanBalanceChart } from "../components/Charts";
@@ -27,7 +28,7 @@ const DEFAULTS = {
   usage:        "",
 };
 
-const TABS = ["サマリー", "CF推移", "感度分析", "物件比較", "PDF出力", "Notion書き出し", "DDレポート"];
+const TABS = ["サマリー", "CF推移", "感度分析", "物件比較", "PDF出力", "Notion書き出し", "周辺取引事例", "DDレポート"];
 
 export default function Home() {
   const [params, setParams] = useState(DEFAULTS);
@@ -206,7 +207,7 @@ export default function Home() {
               )}
 
               {/* DDレポート */}
-              {tab === "DDレポート" && (
+              {tab === "周辺取引事例", "DDレポート" && (
                 <div className={styles.card}>
                   <DDReport params={params} results={r} onReportGenerated={setDdReport} />
                 </div>
