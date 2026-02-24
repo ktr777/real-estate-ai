@@ -7,31 +7,31 @@ const SLIDERS = [
   {
     section: "物件",
     items: [
-      { label: "物件価格",   key: "price",        unit: "円",    min: 5000000,  max: 500000000, step: 1000000,  fmt: (v) => `¥${(v/100000000).toFixed(2)}億` },
-      { label: "専有面積",   key: "area",         unit: "㎡",   min: 20,       max: 1000,      step: 5,        fmt: (v) => `${v}㎡` },
-      { label: "賃料単価",   key: "rentPerSqm",   unit: "円/㎡", min: 500,      max: 15000,     step: 100,      fmt: (v) => `¥${v.toLocaleString()}/㎡` },
+      { label: "物件価格",   key: "price",        unit: "円",    min: 5000000,  max: 500000000, step: 1000000,  fmt: (v) => `¥${(v/100000000).toFixed(2)}億`, tip: "物件の取得価格（税込）" },
+      { label: "専有面積",   key: "area",         unit: "㎡",   min: 20,       max: 1000,      step: 5,        fmt: (v) => `${v}㎡`, tip: "賃貸対象となる専有面積" },
+      { label: "賃料単価",   key: "rentPerSqm",   unit: "円/㎡", min: 500,      max: 15000,     step: 100,      fmt: (v) => `¥${v.toLocaleString()}/㎡`, tip: "1㎡あたりの月額賃料" },
     ],
   },
   {
     section: "収益",
     items: [
-      { label: "空室率",     key: "vacancyRate",  unit: "%",    min: 0,        max: 0.40,      step: 0.01,     fmt: fmtPct },
-      { label: "運営費率",   key: "opexRatio",    unit: "%",    min: 0.10,     max: 0.50,      step: 0.01,     fmt: fmtPct },
+      { label: "空室率",     key: "vacancyRate",  unit: "%",    min: 0,        max: 0.40,      step: 0.01,     fmt: fmtPct, tip: "年間平均の空室率（一般的に5〜10%）" },
+      { label: "運営費率",   key: "opexRatio",    unit: "%",    min: 0.10,     max: 0.50,      step: 0.01,     fmt: fmtPct, tip: "管理費・修繕積立・固定資産税等の合計率" },
     ],
   },
   {
     section: "ファイナンス",
     items: [
-      { label: "LTV",        key: "ltv",          unit: "%",    min: 0.30,     max: 0.90,      step: 0.05,     fmt: fmtPct },
-      { label: "借入金利",   key: "interestRate", unit: "%",    min: 0.005,    max: 0.05,      step: 0.0005,   fmt: (v) => `${(v*100).toFixed(2)}%` },
-      { label: "借入期間",   key: "loanYears",    unit: "年",   min: 10,       max: 35,        step: 1,        fmt: (v) => `${v}年` },
+      { label: "LTV",        key: "ltv",          unit: "%",    min: 0.30,     max: 0.90,      step: 0.05,     fmt: fmtPct, tip: "物件価格に対する借入比率（Loan to Value）" },
+      { label: "借入金利",   key: "interestRate", unit: "%",    min: 0.005,    max: 0.05,      step: 0.0005,   fmt: (v) => `${(v*100).toFixed(2)}%`, tip: "年利（変動・固定問わず想定金利を入力）" },
+      { label: "借入期間",   key: "loanYears",    unit: "年",   min: 10,       max: 35,        step: 1,        fmt: (v) => `${v}年`, tip: "ローン返済期間（一般的に20〜35年）" },
     ],
   },
   {
     section: "出口戦略",
     items: [
-      { label: "保有期間",   key: "holdYears",    unit: "年",   min: 1,        max: 30,        step: 1,        fmt: (v) => `${v}年` },
-      { label: "出口Cap率",  key: "exitCapRate",  unit: "%",    min: 0.02,     max: 0.12,      step: 0.005,    fmt: (v) => `${(v*100).toFixed(1)}%` },
+      { label: "保有期間",   key: "holdYears",    unit: "年",   min: 1,        max: 30,        step: 1,        fmt: (v) => `${v}年`, tip: "売却までの想定保有年数" },
+      { label: "出口Cap率",  key: "exitCapRate",  unit: "%",    min: 0.02,     max: 0.12,      step: 0.005,    fmt: (v) => `${(v*100).toFixed(1)}%`, tip: "売却時の還元利回り（高いほど売却価格が下がる）" },
     ],
   },
 ];
@@ -73,8 +73,8 @@ export default function InputPanel({ params, onChange }) {
       {SLIDERS.map(({ section, items }) => (
         <div key={section} className={styles.sliderSection}>
           <div className={styles.sectionLabel}>{section}</div>
-          {items.map(({ label, key, min, max, step, fmt }) => (
-            <div key={key} className={styles.sliderRow}>
+          {items.map(({ label, key, min, max, step, fmt, tip }) => (
+            <div key={key} className={styles.sliderRow} title={tip}>
               <div className={styles.sliderMeta}>
                 <span className={styles.sliderLabel}>{label}</span>
                 <span className={styles.sliderValue}>{fmt(params[key])}</span>

@@ -86,7 +86,7 @@
    Input Panel
 =========================== */
 .inputPanel {
-  background: #0a1628;
+  background: #152035;
   border: 1px solid #0f2040;
   border-radius: 12px;
   padding: 16px;
@@ -118,6 +118,7 @@
 .textSection {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  overflow: hidden;
   gap: 8px;
   margin-bottom: 16px;
   padding-bottom: 16px;
@@ -132,7 +133,7 @@
 }
 
 .textInput {
-  background: #060d1b;
+  background: #0f1e35;
   border: 1px solid #1e293b;
   border-radius: 6px;
   padding: 6px 8px;
@@ -143,8 +144,8 @@
   transition: border-color 0.15s;
 }
 
-.textInput:focus { border-color: #3b82f6; }
-.textInput::placeholder { color: #334155; }
+.textInput:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+.textInput::placeholder { color: #5a7a9a; }
 
 .sliderSection {
   margin-bottom: 14px;
@@ -192,7 +193,7 @@
 }
 
 .kpiCard {
-  background: #0a1628;
+  background: #152035;
   border: 1px solid #0f2040;
   border-radius: 10px;
   padding: 12px;
@@ -253,7 +254,7 @@
    Card
 =========================== */
 .card {
-  background: #0a1628;
+  background: #152035;
   border: 1px solid #0f2040;
   border-radius: 12px;
   padding: 20px;
@@ -265,6 +266,7 @@
 .summaryGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  overflow: hidden;
   gap: 20px;
 }
 
@@ -399,7 +401,7 @@
 }
 
 .ddContent {
-  background: #060d1b;
+  background: #0f1e35;
   border: 1px solid #0f2040;
   border-radius: 8px;
   padding: 24px;
@@ -441,4 +443,23 @@
 @media (max-width: 640px) {
   .kpiGrid { grid-template-columns: repeat(2, 1fr); }
   .tabs { flex-wrap: wrap; }
+}
+
+.sliderRow {
+  position: relative;
+}
+.sliderRow[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 0;
+  top: -28px;
+  background: #1e3a5f;
+  color: #93c5fd;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #2e5a8a;
+  white-space: nowrap;
+  z-index: 100;
+  pointer-events: none;
 }
