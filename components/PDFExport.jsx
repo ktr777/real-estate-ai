@@ -111,7 +111,7 @@ export default function PDFExport({ params, results }) {
               borderRadius: 8, padding: "12px 16px",
             }}>
               <div style={{ fontSize: 9, letterSpacing: "0.15em", color: "#475569", marginBottom: 4 }}>{label}</div>
-              <div style={{ fontSize: 18, fontFamily: "monospace", fontWeight: 700, color: accent ? "#60a5fa" : "#e2e8f0" }}>{value}</div>
+              <div style={{ fontSize: 18, fontFamily: "monospace", fontWeight: 700, color: accent ? "#2563eb" : "#1a2540" }}>{value}</div>
               <div style={{ fontSize: 9, color: "#1a2540", marginTop: 2 }}>{sub}</div>
             </div>
           ))}
