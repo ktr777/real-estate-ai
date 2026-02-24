@@ -9,7 +9,7 @@ export default function TradeHistory({ params }) {
   const [error, setError]     = useState("");
   const [searched, setSearched] = useState(false);
   const [page, setPage] = useState(1);
-  const PAGE_SIZE = 20;
+  const PAGE_SIZE = 50;
 
   const search = async () => {
     const cityCode = getCityCode(params.area_name || "");
