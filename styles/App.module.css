@@ -45,14 +45,14 @@
 .logoText {
   font-size: 16px;
   font-weight: 700;
-  color: #1a2540;
+  color: #1e3a6e;
   letter-spacing: -0.01em;
 }
 
 .headerSub {
   font-size: 12px;
   color: #475569;
-  border-left: 1px solid #1e293b;
+  border-left: 1px solid #cbd5e1;
   padding-left: 16px;
 }
 
@@ -138,7 +138,7 @@
   border-radius: 6px;
   padding: 6px 8px;
   font-size: 11px;
-  color: #1a2540;
+  color: #1e3a6e;
   font-family: 'Noto Sans JP', sans-serif;
   outline: none;
   transition: border-color 0.15s;
@@ -211,7 +211,7 @@
   font-family: 'JetBrains Mono', monospace;
   font-size: 15px;
   font-weight: 600;
-  color: #1a2540;
+  color: #1e3a6e;
   line-height: 1.2;
   margin-bottom: 4px;
 }
@@ -242,7 +242,7 @@
   font-family: 'Noto Sans JP', sans-serif;
 }
 
-.tab:hover { color: #475569; border-color: #1e293b; }
+.tab:hover { color: #475569; border-color: #cbd5e1; }
 
 .tabActive {
   background: #2563eb;
@@ -293,7 +293,7 @@
 .summaryValue {
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
-  color: #1a2540;
+  color: #1e3a6e;
 }
 
 .divider { border: none; border-top: 1px solid #0f2040; margin: 14px 0; }
@@ -332,7 +332,7 @@
   margin-bottom: 16px;
 }
 
-.ddTitle { font-size: 15px; font-weight: 600; color: #1a2540; }
+.ddTitle { font-size: 15px; font-weight: 600; color: #1e3a6e; }
 .ddSub   { font-size: 11px; color: #475569; margin-top: 2px; }
 
 .ddActions { display: flex; gap: 8px; }
@@ -396,7 +396,7 @@
 
 .ddPlaceholderNote {
   font-size: 11px;
-  color: #1e3a5f;
+  color: #dbeafe;
   margin-top: 8px;
 }
 
@@ -409,11 +409,11 @@
 }
 
 .ddText {}
-.ddText h1 { font-size: 18px; font-weight: 700; color: #1a2540; margin: 0 0 16px; }
+.ddText h1 { font-size: 18px; font-weight: 700; color: #1e3a6e; margin: 0 0 16px; }
 .ddText h2 { font-size: 15px; font-weight: 600; color: #1d4ed8; margin: 20px 0 10px; border-left: 3px solid #1d4ed8; padding-left: 10px; }
 .ddText h3 { font-size: 13px; font-weight: 600; color: #7dd3fc; margin: 14px 0 6px; }
 .ddText p  { font-size: 13px; color: #475569; margin-bottom: 10px; }
-.ddText strong { color: #1a2540; }
+.ddText strong { color: #1e3a6e; }
 
 .cursor {
   display: inline-block;
