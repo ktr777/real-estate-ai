@@ -22,15 +22,9 @@ LTV: ${(params.ltv * 100).toFixed(0)}%
 # 投資DDレポート
 ## 1. エグゼクティブサマリー
 ## 2. 収益性分析
-### 2-1. 利回り評価
-### 2-2. キャッシュフロー評価
-### 2-3. IRR・エクイティマルチプル評価
 ## 3. リスク分析
-### 3-1. 空室リスク
-### 3-2. 金利上昇リスク
-### 3-3. 出口リスク
 ## 4. 投資判断
-## 5. 改善提案・条件交渉ポイント`;
+## 5. 改善提案`;
 
   const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -40,8 +34,8 @@ LTV: ${(params.ltv * 100).toFixed(0)}%
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-6",
-      max_tokens: 2000,
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 1500,
       messages: [{ role: "user", content: prompt }],
     }),
   });
