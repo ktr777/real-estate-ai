@@ -13,7 +13,7 @@ export default function PDFExport({ params, results }) {
       const element = document.getElementById("pdf-content");
       const canvas = await html2canvas(element, {
         scale: 2,
-        backgroundColor: "#0a1628",
+        backgroundColor: "#ffffff",
         useCORS: true,
         logging: false,
       });
@@ -64,7 +64,7 @@ export default function PDFExport({ params, results }) {
           disabled={loading}
           style={{
             padding: "9px 24px",
-            background: loading ? "#1e293b" : "linear-gradient(135deg, #1d4ed8, #7c3aed)",
+            background: loading ? "#cbd5e1" : "linear-gradient(135deg, #1d4ed8, #7c3aed)",
             color: loading ? "#64748b" : "#fff",
             border: "none", borderRadius: 8, fontSize: 13, fontWeight: 500,
             cursor: loading ? "not-allowed" : "pointer",
@@ -77,7 +77,7 @@ export default function PDFExport({ params, results }) {
 
       {/* PDF対象コンテンツ */}
       <div id="pdf-content" style={{
-        background: "#0a1628", color: "#e2e8f0", padding: 32, borderRadius: 12,
+        background: "#ffffff", color: "#1a2540", padding: 32, borderRadius: 12,
         fontFamily: "'Noto Sans JP', sans-serif",
       }}>
         {/* ヘッダー */}
@@ -88,7 +88,7 @@ export default function PDFExport({ params, results }) {
           <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 6px", color: "#fff" }}>
             投資収益シミュレーション レポート
           </h1>
-          <div style={{ fontSize: 12, color: "#64748b" }}>
+          <div style={{ fontSize: 12, color: "#94a3b8" }}>
             作成日：{today}　／　
             {params.area_name && `エリア：${params.area_name}　／　`}
             {params.usage && `用途：${params.usage}`}
@@ -106,8 +106,8 @@ export default function PDFExport({ params, results }) {
             { label: "FCF/年",      value: fmtM(r.fcf),                   sub: "フリーCF" },
           ].map(({ label, value, sub, accent }) => (
             <div key={label} style={{
-              background: accent ? "#1d4ed822" : "#060d1b",
-              border: `1px solid ${accent ? "#3b82f6" : "#1e293b"}`,
+              background: accent ? "#dbeafe" : "#f8fafc",
+              border: `1px solid ${accent ? "#3b82f6" : "#cbd5e1"}`,
               borderRadius: 8, padding: "12px 16px",
             }}>
               <div style={{ fontSize: 9, letterSpacing: "0.15em", color: "#475569", marginBottom: 4 }}>{label}</div>
@@ -120,7 +120,7 @@ export default function PDFExport({ params, results }) {
         {/* 2カラム */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
           {/* NOI内訳 */}
-          <div style={{ background: "#060d1b", border: "1px solid #1e293b", borderRadius: 8, padding: 16 }}>
+          <div style={{ background: "#f8fafc", border: "1px solid #1e293b", borderRadius: 8, padding: 16 }}>
             <div style={{ fontSize: 10, letterSpacing: "0.15em", color: "#475569", marginBottom: 12 }}>NOI 内訳</div>
             {[
               { label: "満室想定賃料",      value: r.grossRent,     color: "#3b82f6" },
@@ -133,7 +133,7 @@ export default function PDFExport({ params, results }) {
               { label: "FCF",              value: r.fcf,             color: r.fcf >= 0 ? "#10b981" : "#ef4444", bold: true },
             ].map(({ label, value, color, bold }) => (
               <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #0a1f3d" }}>
-                <span style={{ fontSize: 11, color: "#64748b", fontWeight: bold ? 600 : 400 }}>{label}</span>
+                <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: bold ? 600 : 400 }}>{label}</span>
                 <span style={{ fontSize: 12, fontFamily: "monospace", color, fontWeight: bold ? 700 : 400 }}>
                   {value >= 0 ? "" : "▲ "}{fmtM(Math.abs(value))}
                 </span>
@@ -142,7 +142,7 @@ export default function PDFExport({ params, results }) {
           </div>
 
           {/* 資金計画 */}
-          <div style={{ background: "#060d1b", border: "1px solid #1e293b", borderRadius: 8, padding: 16 }}>
+          <div style={{ background: "#f8fafc", border: "1px solid #1e293b", borderRadius: 8, padding: 16 }}>
             <div style={{ fontSize: 10, letterSpacing: "0.15em", color: "#475569", marginBottom: 12 }}>資金計画</div>
             {[
               { label: "物件価格",     value: fmtM(params.price) },
@@ -155,21 +155,21 @@ export default function PDFExport({ params, results }) {
               { label: "売却手取り",   value: fmtM(r.exitProceeds) },
             ].map(({ label, value, bold }) => (
               <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #0a1f3d" }}>
-                <span style={{ fontSize: 11, color: "#64748b", fontWeight: bold ? 600 : 400 }}>{label}</span>
-                <span style={{ fontSize: 12, fontFamily: "monospace", color: "#e2e8f0", fontWeight: bold ? 700 : 400 }}>{value}</span>
+                <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: bold ? 600 : 400 }}>{label}</span>
+                <span style={{ fontSize: 12, fontFamily: "monospace", color: "#1a2540", fontWeight: bold ? 700 : 400 }}>{value}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* 年次CF表 */}
-        <div style={{ background: "#060d1b", border: "1px solid #1e293b", borderRadius: 8, padding: 16, marginBottom: 24 }}>
+        <div style={{ background: "#f8fafc", border: "1px solid #1e293b", borderRadius: 8, padding: 16, marginBottom: 24 }}>
           <div style={{ fontSize: 10, letterSpacing: "0.15em", color: "#475569", marginBottom: 12 }}>年次キャッシュフロー</div>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
             <thead>
               <tr>
                 {["年次", "NOI", "元利返済", "FCF", "残債"].map((h) => (
-                  <th key={h} style={{ padding: "6px 8px", textAlign: "right", color: "#64748b", borderBottom: "1px solid #1e293b", fontWeight: 500, whiteSpace: "nowrap" }}>{h}</th>
+                  <th key={h} style={{ padding: "6px 8px", textAlign: "right", color: "#94a3b8", borderBottom: "1px solid #1e293b", fontWeight: 500, whiteSpace: "nowrap" }}>{h}</th>
                 ))}
               </tr>
             </thead>

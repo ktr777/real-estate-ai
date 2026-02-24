@@ -86,8 +86,8 @@ function PropertyCard({ index, params, onChange, onRemove, result, color }) {
 }
 
 const tooltipStyle = {
-  background: "#0f172a", border: "1px solid #1e293b",
-  borderRadius: 8, fontSize: 11, color: "#e2e8f0",
+  background: "#ffffff", border: "1px solid #cbd5e1",
+  borderRadius: 8, fontSize: 11, color: "#1a2540",
 };
 
 export default function ComparePanel() {
@@ -236,7 +236,7 @@ export default function ComparePanel() {
           <div className={styles.chartTitle}>総合評価レーダー</div>
           <ResponsiveContainer width="100%" height={260}>
             <RadarChart data={radarData}>
-              <PolarGrid stroke="#1e293b" />
+              <PolarGrid stroke="#e2e8f0" />
               <PolarAngleAxis dataKey="metric" tick={{ fontSize: 11, fill: "#64748b" }} />
               {properties.map((p, i) => (
                 <Radar key={i} name={p.name || `物件${i+1}`}
@@ -253,7 +253,7 @@ export default function ComparePanel() {
           <div className={styles.chartTitle}>出口Cap率 × IRR 比較</div>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={sensData} margin={{ top: 4, right: 4, bottom: 4, left: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="exitCap" tick={{ fontSize: 10, fill: "#64748b" }} />
               <YAxis tick={{ fontSize: 10, fill: "#64748b" }} tickFormatter={(v) => `${v}%`} />
               <Tooltip formatter={(v) => [`${v}%`, "IRR"]} contentStyle={tooltipStyle} />
