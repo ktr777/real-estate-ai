@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { getPrefectureCode, getCityCode } from "../lib/prefectures";
+import dynamic from "next/dynamic";
+const TradeMap = dynamic(() => import("./TradeMap"), { ssr: false });
 
 const fmtMan = (v) => v ? `¥${Math.round(v / 10000).toLocaleString()}万` : "-";
 
@@ -165,6 +167,9 @@ export default function TradeHistory({ params }) {
                 次へ →
               </button>
             </div>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <TradeMap trades={filtered.slice(0, 200)} />
           </div>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
