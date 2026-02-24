@@ -55,10 +55,18 @@ export default function TradeHistory({ params }) {
   // フィルタ・ソート
   let filtered = [...trades];
   if (filterType !== "all") filtered = filtered.filter(t => t.Type === filterType);
-  if (sortOrder === "asc") filtered.sort((a, b) => (a.TradePrice/a.Area||0) - (b.TradePrice/b.Area||0));
-  if (sortOrder === "district_asc") filtered.sort((a, b) => (a.DistrictName||'').localeCompare(b.DistrictName||'', 'ja'));
-  if (sortOrder === "district_desc") filtered.sort((a, b) => (b.DistrictName||'').localeCompare(a.DistrictName||'', 'ja'));
-  if (sortOrder === "desc") filtered.sort((a, b) => (b.TradePrice/b.Area||0) - (a.TradePrice/a.Area||0));
+  filtered.sort((a, b) => {
+    if (sortDistrict !== "none") {
+      const cmp = (a.DistrictName||'').localeCompare(b.DistrictName||'', 'ja');
+      if (cmp !== 0) return sortDistrict === "asc" ? cmp : -cmp;
+    }
+    if (sortTsubo !== "none") {
+      const tsuboA = a.TradePrice/a.Area||0;
+      const tsuboB = b.TradePrice/b.Area||0;
+      return sortTsubo === "asc" ? tsuboA - tsuboB : tsuboB - tsuboA;
+    }
+    return 0;
+  });
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paged = filtered.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
 
